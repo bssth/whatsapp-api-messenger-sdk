@@ -1,15 +1,24 @@
 <?php
+    namespace Mike4ip;
 
     /**
-     * Class ChatApi
+     * Class ApiMessenger
+     * @package Mike4ip
      */
-    class ChatApi
+    class ApiMessenger
     {
-        protected $token = '';
+        /**
+         * @var string
+         */
+        protected $token;
+
+        /**
+         * @var string
+         */
         protected $url = '';
 
         /**
-         * ChatApi constructor.
+         * ApiMessenger constructor.
          * @param string $token
          * @param string $url
          */
@@ -109,7 +118,7 @@
         /**
          * @param string $chat
          * @param string $text
-         * @return mixed
+         * @return array
          */
         public function sendPhoneMessage(string $chat, string $text)
         {
@@ -125,11 +134,16 @@
         }
 
         /**
-         * @return mixed
+         * @return string
          */
-        public function getQRCode()
+        public function getQRCode(): string
         {
-            return json_decode($this->query('go', []), true);
+            return base64_decode(
+                json_decode(
+                    $this->query('go', []),
+                    true
+                )['img']
+            );
         }
 
         /**
@@ -147,10 +161,10 @@
         /**
          * @param string $chat
          * @param string $text
-         * @return mixed
+         * @return string
          */
-        public function sendMessage(string $chat, string $text)
+        public function sendMessage(string $chat, string $text): string
         {
-            return json_decode($this->query('sendmessage', [['chatId' => $chat, 'message' => $text]], "POST"), 1);
+            return json_decode($this->query('sendmessage', [['chatId' => $chat, 'message' => $text]], "POST"), 1)['status'];
         }
     }
