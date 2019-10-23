@@ -12,8 +12,8 @@ composer require mikechip/apimessenger
 # Create instance
 
 <pre>
-  $api = new ApiMessenger(
-        '_token_', // api-messenger.com token
+  $api = new Mike4ip\ApiMessenger(
+        '_token_' // api-messenger.com token
   );
 </pre>
 
