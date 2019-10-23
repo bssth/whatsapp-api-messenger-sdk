@@ -22,6 +22,6 @@
         }
     ],
     "autoload": {
-        "classmap": ["src/apimessenger.php"]
+        "classmap": ["src/apimessenger.php", "src/apimessengerexception.php"]
     }
 }

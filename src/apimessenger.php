@@ -72,13 +72,14 @@
         /**
          * @param int $offset
          * @return array
+         * @throws ApiMessengerException
          */
         public function getInbox(int $offset = 0): array
         {
             $inbox = json_decode($this->query('messages', ($offset > 0) ? ['page' => $offset] : ['new' => 1]), 1);
 
             if(!isset($inbox['status']) || $inbox['status'] != "OK")
-                return [];
+                throw new ApiMessengerException('Cannot read inbox. Result: ' . var_export($inbox, true));
 
             $newOffset = $inbox['pager']['currentPage']+1;
             $mess = $inbox['messages'];
@@ -101,6 +102,7 @@
         /**
          * @param string $author
          * @return array
+         * @throws ApiMessengerException
          */
         public function getChatMessages(string $author): array
         {
@@ -119,6 +121,7 @@
          * @param string $chat
          * @param string $text
          * @return array
+         * @throws ApiMessengerException
          */
         public function sendPhoneMessage(string $chat, string $text)
         {
@@ -127,6 +130,7 @@
 
         /**
          * @return array
+         * @throws ApiMessengerException
          */
         public function getWebhook(): array
         {
@@ -135,6 +139,7 @@
 
         /**
          * @return string
+         * @throws ApiMessengerException
          */
         public function getQRCode(): string
         {
@@ -152,6 +157,7 @@
          * @param $filename
          * @param $caption
          * @return mixed
+         * @throws ApiMessengerException
          */
         public function sendFile(string $chat, string $body, string $filename, string $caption)
         {
@@ -162,6 +168,7 @@
          * @param string $chat
          * @param string $text
          * @return string
+         * @throws ApiMessengerException
          */
         public function sendMessage(string $chat, string $text): string
         {
