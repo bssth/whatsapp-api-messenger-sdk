@@ -44,29 +44,36 @@
          * @param array $args
          * @param string $qmethod
          * @return string
+         * @throws ApiMessengerException
          */
         public function query(string $method, array $args, string $qmethod = 'GET'): string
         {
+            $ch = curl_init();
             $url = $this->createUrl($method);
 
             if($qmethod == "POST" && isset($args) && is_array($args)) {
-                $json = json_encode($args);
+                $content = json_encode($args);
 
-                $options = stream_context_create(['http' => [
-                    'method' => $qmethod,
-                    'header' => 'Content-type: application/json',
-                    'content' => $json
-                ]]);
+                curl_setopt($ch, CURLOPT_URL, $url);
+                curl_setopt($ch, CURLOPT_POST, 1);
+                curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                    'Content-Type: application/json',
+                    'Content-Length: ' . strlen($content)
+                ]);
+                curl_setopt($ch, CURLOPT_POSTFIELDS, $content);
             } elseif($qmethod == "GET" && isset($args) && is_array($args)) {
                 $url = $this->createUrl($method, $args);
-
-                $options = stream_context_create(['http' => [
-                    'method' => $qmethod,
-                    'header' => 'Content-type: application/json',
-                ]]);
+                curl_setopt($ch, CURLOPT_URL, $url);
             }
 
-            return file_get_contents($url, false, isset($options) ? $options : null);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            $result = curl_exec($ch);
+
+            if(strlen($error = curl_error($ch)))
+                throw new ApiMessengerException($error);
+
+            curl_close($ch);
+            return $result;
         }
 
         /**
@@ -144,10 +151,19 @@
         public function getQRCode(): string
         {
             return base64_decode(
-                json_decode(
-                    $this->query('go', []),
-                    true
-                )['img']
+                $this->queryGo()['img']
+            );
+        }
+
+        /**
+         * @return array
+         * @throws ApiMessengerException
+         */
+        public function queryGo(): array
+        {
+            return json_decode(
+                $this->query('go', []),
+                true
             );
         }
 
